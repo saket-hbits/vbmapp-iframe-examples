@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VB-MAPP Assessment View</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./config.js"></script>
+  <script src="./common.js"></script>
+</head>
+<body class="iframe-page-body">
+  <div class="page iframe-page">
+    <div class="header">
+      <h1>VB-MAPP Assessment View</h1>
+      <div class="header-actions">
+        <a class="button ghost" href="./index.html">Demo menu</a>
+        <button class="ghost" type="button" onclick="sessionStorage.removeItem('vbmappSignInToken'); location.href='./index.html';">Change token</button>
+      </div>
+    </div>
+    <div id="mount-point"></div>
+    <div id="status" class="status">Initializing...</div>
+  </div>
+
+  <script>
+    DataMTDHelpers.mountDataMTD(function (cfg, mountPoint) {
+      if (typeof openAssessmentViewIframe !== "function") {
+        throw new Error("openAssessmentViewIframe is not available.");
+      }
+
+      openAssessmentViewIframe(
+        cfg.userAgent,
+        cfg.acceptLanguage,
+        cfg.signInToken,
+        cfg.assessmentId,
+        mountPoint
+      );
+    }, ["assessmentId"]);
+  </script>
+</body>
+</html>

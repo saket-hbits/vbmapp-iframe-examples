@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VB-MAPP iFrame Demo</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="card hero">
+      <div class="eyebrow">Motivity × VB-MAPP</div>
+      <h1>VB-MAPP iFrame Demo</h1>
+      <p>
+        Enter a temporary DataMTD sign-in token to view the available iframe screens.
+        The token is kept only in this browser tab/session and is not written to the repository.
+      </p>
+
+      <form id="token-form" class="token-form">
+        <label for="token">Sign-in token</label>
+        <div class="input-row">
+          <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste temporary signinToken" required />
+          <button type="button" id="toggle-token" class="secondary">Show</button>
+          <button type="submit">Continue</button>
+        </div>
+        <div id="message" class="note">Use the temporary token returned by DataMTD <code>/1/signin</code>.</div>
+      </form>
+
+      <section id="demo-section" hidden>
+        <div class="actions">
+          <button type="button" id="change-token" class="ghost">Change token</button>
+          <button type="button" id="clear-token" class="ghost">Clear token</button>
+        </div>
+
+        <div class="demo-grid">
+          <a class="demo-card" href="./iframe_learner_overview.html">
+            <strong>Learner Overview</strong>
+            <span>Open the selected learner's overview inside VB-MAPP.</span>
+          </a>
+          <a class="demo-card" href="./iframe_learner_list.html">
+            <strong>Learner List</strong>
+            <span>View the VB-MAPP learner list screen.</span>
+          </a>
+          <a class="demo-card" href="./iframe_assessment_latest.html">
+            <strong>Latest Assessment</strong>
+            <span>Open the latest assessment for the configured learner.</span>
+          </a>
+          <a class="demo-card" href="./iframe_assessment_view.html">
+            <strong>Assessment View</strong>
+            <span>Open a specific assessment using the configured assessment ID.</span>
+          </a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var TOKEN_KEY = "vbmappSignInToken";
+      var form = document.getElementById("token-form");
+      var tokenInput = document.getElementById("token");
+      var demoSection = document.getElementById("demo-section");
+      var message = document.getElementById("message");
+      var toggleButton = document.getElementById("toggle-token");
+      var changeButton = document.getElementById("change-token");
+      var clearButton = document.getElementById("clear-token");
+
+      function getReturnTo() {
+        var params = new URLSearchParams(window.location.search);
+        var value = params.get("returnTo");
+        return /^[a-zA-Z0-9_.-]+\.html$/.test(value || "") ? value : "";
+      }
+
+      function showReadyState() {
+        form.hidden = true;
+        demoSection.hidden = false;
+      }
+
+      function showEntryState() {
+        form.hidden = false;
+        demoSection.hidden = true;
+        tokenInput.value = "";
+        tokenInput.focus();
+      }
+
+      var existingToken = sessionStorage.getItem(TOKEN_KEY);
+      if (existingToken) {
+        var returnTo = getReturnTo();
+        if (returnTo) {
+          window.location.replace("./" + returnTo);
+        } else {
+          showReadyState();
+        }
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var token = tokenInput.value.trim();
+        if (!token) {
+          message.textContent = "Please enter a sign-in token.";
+          message.classList.add("error");
+          return;
+        }
+
+        sessionStorage.setItem(TOKEN_KEY, token);
+        message.classList.remove("error");
+
+        var returnTo = getReturnTo();
+        if (returnTo) {
+          window.location.replace("./" + returnTo);
+          return;
+        }
+
+        showReadyState();
+      });
+
+      toggleButton.addEventListener("click", function () {
+        var showing = tokenInput.type === "text";
+        tokenInput.type = showing ? "password" : "text";
+        toggleButton.textContent = showing ? "Show" : "Hide";
+      });
+
+      changeButton.addEventListener("click", showEntryState);
+
+      clearButton.addEventListener("click", function () {
+        sessionStorage.removeItem(TOKEN_KEY);
+        showEntryState();
+      });
+    })();
+  </script>
+</body>
+</html>
